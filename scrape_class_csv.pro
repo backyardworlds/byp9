@@ -3,6 +3,7 @@ function scrape_class_csv, lines, nrow_max=nrow_max
   if ~keyword_set(nrow_max) then nrow_max = 5000000L
 
   outstr = replicate({racen_subt: 0.0d, deccen_subt: 0.0d, tnum: 0L, $
+                      class_id: 0L, $
                       x_zoo: 0.0, y_zoo: 0.0, nclick: 0L, $
                       x_unwise_ll: 0L, y_unwise_ll: 0L, $
                       x_subtile: 0.0, y_subtile: 0.0, $
@@ -26,8 +27,8 @@ function scrape_class_csv, lines, nrow_max=nrow_max
       if (num EQ -1) then continue
 
       addstr = $
-    replicate({racen_subt: radec.ra, deccen_subt: radec.dec, tnum: long(num)}, $
-        nclicks)
+    replicate({racen_subt: radec.ra, deccen_subt: radec.dec, $
+               tnum: long(num), class_id: long(i)}, nclicks)
       clicks = struct_addtags(addstr, clicks)
 
 ; add columns giving, for each click, the coordinates of the relevant
