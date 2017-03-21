@@ -1,6 +1,6 @@
 pro allwise_xmatch, zoo, allwise, m_zoo, m_allwise
 
-  zoo = mrdfits('click_catalog.fits', 1)
+  zoo = mrdfits('/project/projectdirs/cosmo/www/temp/ameisner/backyardworlds/03052017/subject_id/click_catalog.fits.gz', 1)
 
   allwise = $
       mrdfits('/global/cscratch1/sd/ameisner/motion_sample_redo-snr.fits',1)
