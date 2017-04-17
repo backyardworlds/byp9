@@ -2,10 +2,11 @@ pro allwise_xmatch, zoo, allwise, m_zoo, m_allwise
 
   zoo = mrdfits('/project/projectdirs/cosmo/www/temp/ameisner/backyardworlds/03052017/subject_id/click_catalog.fits.gz', 1)
 
+;  allwise = $
+;      mrdfits('/global/cscratch1/sd/ameisner/motion_sample_redo-snr.fits',1)
+
   allwise = $
-      mrdfits('/global/cscratch1/sd/ameisner/motion_sample_redo-snr.fits',1)
-
-
+   mrdfits('/scratch1/scratchdirs/ameisner/motion_sample_redo-snr-0.500.fits',1)
   zoo.ra += (zoo.ra LT 0)*360.0d
 
 ; get rid of classifications that clicked too many things
