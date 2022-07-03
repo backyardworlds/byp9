@@ -1,6 +1,6 @@
 pro estimate_unique_users
 
-  fname = 'backyard-worlds-planet-9-classifications.csv'
+  fname = 'classifications.csv'
   t0 = systime(1)
   readcol, fname, classification_id, user_name, user_id, F='A, A, A, A', $
       user_ip, /preserve_null, skipline=1
@@ -18,8 +18,10 @@ pro estimate_unique_users
 
 end
 
-pro analyze_num_users
+pro analyze_num_users, n_registered_homepage=n_registered_homepage
 
+  if ~keyword_set(n_registered_homepage) then n_registered_homepage = 0L
+  
   str = mrdfits('classifications_summary.fits', 1)
 
   str.user_id = strtrim(str.user_id, 2)
@@ -32,6 +34,11 @@ pro analyze_num_users
 
   print, 'number of unique registered users : ', n_reg_users
 
+  ; seems like it shouldn't be possible that the classifications file
+  ; has MORE unique registered users' user names than the total number of
+  ; registered users according to the backyardworlds.org zooniverse homepage
+  if (n_reg_users GT n_registered_homepage) then stop
+  
   ips_reg_users = unique(str[w_reg_login].user_ip)
 
   print, 'number of unique IP addresses belonging to users registered and logged in : ', n_elements(ips_reg_users)
@@ -43,7 +50,7 @@ pro analyze_num_users
 
   avg_ips_per_user = float(n_elements(ips_reg_users))/float(n_reg_users)
 
-  print, 'average number of IP addresses per registered user : ', avg_ips_per_user
+  print, 'average number of IP addresses per registered user who has made a nonzero number of classifications : ', avg_ips_per_user
 
   matchlist, ips_reg_users, str.user_ip, _, m_all
 
@@ -70,8 +77,36 @@ pro analyze_num_users
 
   n_users_nonreg = float(n_elements(ips_u_nonreg))/avg_ips_per_user
 
+
+  n_registered_no_classifications = keyword_set(n_registered_homepage) ? $
+                                    n_registered_homepage - n_reg_users : $
+                                    0L
+
   print, 'estimated number of unique non-registered users : ', n_users_nonreg
 
-  print, 'estimated total number of unique users : ', long(n_users_nonreg + n_reg_users)
+  print, 'number of registered users according to Zooniverse landing page : ', $
+         keyword_set(n_registered_homepage) ? n_registered_homepage : $
+         'UNKNOWN'
+  
+  ; this is effectively a lower bound in that the # of unique IP addresses
+  ; per registered user is probably best
+  ; considered an upper bound on the # of unique IP addresses per
+  ; non-registered user
+  final_estimate_lower = $
+     long(n_users_nonreg + n_reg_users + n_registered_no_classifications)
 
+  print, 'estimated total number of unique users (LOWER bound): ', $
+         final_estimate_lower
+
+  ; upper bound assumes that non-registered users are maximally transitory
+  ; and only use one IP address (i.e., they don't return over long
+  ; time spans or from multiple different machines)
+  final_estimate_upper =  long(n_elements(ips_u_nonreg) + n_reg_users + n_registered_no_classifications)
+  print, 'estimated total number of unique users (UPPER bound): ', $
+         final_estimate_upper
+
+
+  print, 'average of upper/lower bounds on total number of unique users : ', $
+         long(round(mean([final_estimate_lower, final_estimate_upper])))
+  
 end
